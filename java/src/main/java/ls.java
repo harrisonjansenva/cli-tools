@@ -1,16 +1,19 @@
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
+import java.util.Comparator;
+import java.util.stream.StreamSupport;
 
 @Command(name="ls", description = "List directory contents")
 public class ls implements Runnable{
 
-    @Option(names = {"-d", "--directory"}, description = "Specify the directory to list")
+    @Option(names = {"-d", "--directory"}, defaultValue = ".", description = "Specify the directory to list")
     private String directory;
 
     @Option(names = {"-s", "--sort"}, description = "Sort the output alphabetically in ascending order")
@@ -26,17 +29,31 @@ public class ls implements Runnable{
 
     @Override
     public void run() {
+        if (helpRequested) {
+            CommandLine.usage(this, System.out);
+        }
         Path path = Paths.get(directory);
-        try {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(path);
-            
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            var fileStream = StreamSupport.stream(stream.spliterator(), false)
+                    .filter(p -> {
+                        return all || !p.toFile().isHidden();
+                    }).sorted();
+            if (reverse) {
+                fileStream = fileStream.sorted(Comparator.reverseOrder());
+            }
+            fileStream.forEach(
+                    p -> System.out.println(p.getFileName()));
         } catch (IOException e) {
-            System.err.println("No such file or directory: " + directory);
+            System.err.println("No such directory: " + path);
+        } catch (SecurityException e) {
+            System.err.println("Permission denied");
         }
     } 
 
     public static void main(String[] args) {
-
+        ls cli = new ls();
+        new CommandLine(cli).execute(args);
+        
 
     }
 }
