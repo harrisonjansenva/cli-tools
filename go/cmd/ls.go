@@ -22,7 +22,7 @@ var lsCmd = &cobra.Command{
 
 func init() {
 
-	path = rootCmd.PersistentFlags().StringP("path", "p", ".", "set a path to read all files from")
+	path = rootCmd.PersistentFlags().StringP("directory", "d", ".", "set a directory to read all entries in")
 	rootCmd.AddCommand(lsCmd)
 
 	// Here you will define your flags and configuration settings.
