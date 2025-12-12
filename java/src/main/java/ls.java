@@ -1,14 +1,18 @@
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
+/**
+ * This is my implementation of the ls command line tool.
+ *
+ */
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
+
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 @Command(name="ls", description = "List directory contents")
 public class ls implements Runnable{
@@ -33,7 +37,7 @@ public class ls implements Runnable{
             CommandLine.usage(this, System.out);
         }
         Path path = Paths.get(directory);
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+        try (var stream = Files.newDirectoryStream(path)) {
             var fileStream = StreamSupport.stream(stream.spliterator(), false)
                     .filter(p -> {
                         return all || !p.toFile().isHidden();
