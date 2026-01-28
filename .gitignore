@@ -23,11 +23,11 @@
 hs_err_pid*
 replay_pid*
 # all Jetbrains files 
-/.idea/
+**/.idea/
 *.iml
 
 #all vscode specific files
-/.vscode/
+**/.vscode/
 
 # ignore macOS files
 *.DS_Store
